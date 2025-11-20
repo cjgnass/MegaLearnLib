@@ -1,5 +1,5 @@
-#include "./algorithms/naive_bayes_classifier.cpp"
-#include "./algorithms/regression.cpp"
+#include "./algorithms/naive_bayes_classifier.h"
+#include "./algorithms/regression.h"
 #include <Eigen/Dense>
 #include <iostream>
 #include <random>
