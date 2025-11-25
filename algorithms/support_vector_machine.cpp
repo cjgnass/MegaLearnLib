@@ -19,13 +19,12 @@ void SupportVectorMachine::train(MatrixXd &X, VectorXd &y,
   for (int epoch = 0; epoch < epochs; epoch++) {
     vector<int> randomIdxs = getRandomIndices(nSamples);
     for (int batchStart = 0; batchStart < nSamples; batchStart += batchSize) {
-      int currBatchSize =
-          batchStart + batchSize > nSamples ? nSamples - batchStart : batchSize;
+      int currBatchSize = min(batchSize, nSamples - batchStart);
       MatrixXd batchX(currBatchSize, nFeatures);
       VectorXd batchy(currBatchSize);
 
-      for (int i = batchStart; i < currBatchSize; i++) {
-        int bi = i - batchStart;
+      for (int bi = 0; bi < currBatchSize; bi++) {
+        int i = batchStart + bi;
         batchX.row(bi) = X.row(randomIdxs[i]);
         batchy(bi) = y(randomIdxs[i]);
       }
@@ -42,10 +41,10 @@ void SupportVectorMachine::train(MatrixXd &X, VectorXd &y,
       weights -= learningRate * wGrad;
       bias -= learningRate * bGrad;
     }
-    VectorXd decisionScore = X * weights;
-    decisionScore.array() += bias;
-    ArrayXd margins = y.array() * decisionScore.array();
     if (epoch % 10 == 0) {
+      VectorXd decisionScore = X * weights;
+      decisionScore.array() += bias;
+      ArrayXd margins = y.array() * decisionScore.array();
       ArrayXd hinge = (1.0 - margins).max(0.0);
       double loss = 0.5 * weights.squaredNorm() + regularization * hinge.mean();
       cout << "Epoch " << epoch << " Loss: " << loss << '\n';
@@ -59,7 +58,7 @@ void SupportVectorMachine::train(MatrixXd &X, VectorXd &y,
   this->batchSize = batchSize;
 }
 
-int SupportVectorMachine::predict(VectorXd &x) { 
+int SupportVectorMachine::predict(VectorXd &x) {
   double decisionScore = x.dot(weights);
   decisionScore += bias;
   return decisionScore > 0 ? 1 : -1;

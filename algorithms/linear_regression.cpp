@@ -1,41 +1,64 @@
 #include "linear_regression.h"
+#include "../tools.h"
+#include <cassert>
+#include <cmath>
+#include <iostream>
+#include <random>
+using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-LinearRegression::LinearRegression() : weights() {}
+void LinearRegression::train(MatrixXd &X, VectorXd &y, double learningRate,
+                             int epochs, int batchSize) {
+  int nSamples = X.rows();
+  int nFeatures = X.cols();
+  if (batchSize > nSamples || batchSize <= 0)
+    batchSize = nSamples;
+  VectorXd weights = VectorXd::Zero(nFeatures);
+  double bias = 0;
+  for (int epoch = 0; epoch < epochs; epoch++) {
+    vector<int> randomIdxs = getRandomIndices(nSamples);
+    for (int batchStart = 0; batchStart < nSamples; batchStart += batchSize) {
+      int currBatchSize = min(nSamples - batchStart, batchSize);
+      MatrixXd batchX(currBatchSize, nFeatures);
+      VectorXd batchy(currBatchSize);
+      for (int bi = 0; bi < currBatchSize; bi++) {
+        int i = batchStart + bi;
+        batchX.row(bi) = X.row(randomIdxs[i]);
+        batchy(bi) = y(randomIdxs[i]);
+      }
+
+      VectorXd prediction = batchX * weights;
+      prediction.array() += bias;
+      VectorXd error = prediction - batchy;
+
+      VectorXd wGrad = (2.0 / currBatchSize) * batchX.transpose() * error;
+      double bGrad = (2.0 / currBatchSize) * error.sum();
+
+      weights -= learningRate * wGrad;
+      bias -= learningRate * bGrad;
+    }
+    if (epoch % 10 == 0) {
+      VectorXd prediction = X * weights;
+      prediction.array() += bias;
+      VectorXd error = prediction - y;
+      cout << "Epoch: " << epoch << " Loss: " << error.squaredNorm() << '\n';
+    }
+  }
+
+  this->weights = weights;
+  this->bias = bias;
+  this->learningRate = learningRate;
+  this->epochs = epochs;
+  this->batchSize = batchSize;
+}
+
+double LinearRegression::predict(VectorXd &x) {
+  return x.dot(weights) + bias;
+}
 
 VectorXd LinearRegression::getWeights() { return weights; }
-
-void LinearRegression::train(MatrixXd xs, VectorXd ysTrue,
-                       double learningRate, int epochs) {
-  assert(xs.rows() == ysTrue.size());
-  MatrixXd A = MatrixXd::Ones(xs.rows(), xs.cols() + 1);
-  A.rightCols(xs.cols()) = xs;
-  VectorXd w(A.cols());
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_real_distribution<double> dist(-w.size(), w.size());
-  for (int i = 0; i < w.size(); i++) {
-    w(i) = dist(gen);
-  }
-  for (int epoch = 0; epoch < epochs; epoch++) {
-    VectorXd ysPred = A * w;
-    VectorXd error = ysPred - ysTrue;
-    VectorXd gradient = (2.0 / ysPred.cols()) * (A.transpose() * error);
-    w -= learningRate * gradient;
-    double sse = 0;
-    for (double e : error) {
-      sse += pow(e, 2);
-    }
-    double mse = sse / error.size();
-    std::cout << "Loss : " << mse << '\n';
-  }
-  weights = w;
-}
-
-double LinearRegression::predict(VectorXd x) {
-  VectorXd newX = VectorXd::Ones(x.size());
-  newX.tail(x.size()) = x;
-  return newX.dot(weights);
-}
-
+double LinearRegression::getBias() { return bias; }
+double LinearRegression::getLearningRate() { return learningRate; }
+int LinearRegression::getEpochs() { return epochs; }
+int LinearRegression::getBatchSize() { return batchSize; }
