@@ -1,16 +1,21 @@
-// #include <Eigen/Dense>
+#pragma once 
 #include <Eigen/Dense>
-#include <iostream>
-#include <random>
 
 class LogisticRegression {
 public:
-  LogisticRegression();
-  void train(Eigen::MatrixXd &xs, Eigen::VectorXd &ys,
-             double learningRate = 0.001, int epochs = 50000);
+  void train(Eigen::MatrixXd &X, Eigen::VectorXd &y,
+             double learningRate = 0.01, int epochs = 5000, int batchSize = 0);
   int predict(Eigen::VectorXd &x);
   Eigen::VectorXd getWeights();
+  double getBias();
+  double getLearningRate();
+  int getEpochs();
+  int getBatchSize();
 
 private:
   Eigen::VectorXd weights;
+  double bias;
+  double learningRate;
+  int epochs;
+  int batchSize;
 };
