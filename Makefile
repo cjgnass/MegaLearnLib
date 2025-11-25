@@ -4,7 +4,7 @@ CXXFLAGS =  -std=c++23 -I ./eigen
 all: main
 
 main: main.cpp tools.o linear_regression.o naive_bayes_classifier.o logistic_regression.o support_vector_machine.o
-	$(CXX) $(CXXFLAGS) main.cpp linear_regression.o naive_bayes_classifier.o logistic_regression.o support_vector_machine.o -o main -g
+	$(CXX) $(CXXFLAGS) main.cpp tools.o linear_regression.o naive_bayes_classifier.o logistic_regression.o support_vector_machine.o -o main -g
 
 tools.o: ./tools.cpp 
 	$(CXX) $(CXXFLAGS) -c ./tools.cpp -o tools.o

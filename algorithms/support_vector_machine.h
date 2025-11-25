@@ -1,11 +1,10 @@
-#include <iostream> 
+#pragma once
 #include <Eigen/Dense>
-#include <random> 
 
-
-class SupportVectorMachine { 
-public: 
-  void train(Eigen::MatrixXd &X, Eigen::VectorXd &y, double regularization = 1, double learningRate = 0.01, int epochs = 5000, int batchSize = 0);
+class SupportVectorMachine {
+public:
+  void train(Eigen::MatrixXd &X, Eigen::VectorXd &y, double regularization = 1,
+             double learningRate = 0.01, int epochs = 5000, int batchSize = 0);
   int predict(Eigen::VectorXd &x);
   Eigen::VectorXd getWeights();
   double getBias();
@@ -14,8 +13,7 @@ public:
   int getEpochs();
   int getBatchSize();
 
-
-private: 
+private:
   Eigen::VectorXd weights;
   double bias;
   double regularization;

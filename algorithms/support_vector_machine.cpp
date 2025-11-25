@@ -1,11 +1,11 @@
 #include "support_vector_machine.h"
-#include "../tools.cpp"
+#include "../tools.h"
+#include <iostream>
 
 using namespace std;
 using Eigen::ArrayXd;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-
 
 void SupportVectorMachine::train(MatrixXd &X, VectorXd &y,
                                  double regularization, double learningRate,
@@ -19,16 +19,16 @@ void SupportVectorMachine::train(MatrixXd &X, VectorXd &y,
   for (int epoch = 0; epoch < epochs; epoch++) {
     vector<int> randomIdxs = getRandomIndices(nSamples);
     for (int batchStart = 0; batchStart < nSamples; batchStart += batchSize) {
-      int currBatchSize = batchStart + batchSize > nSamples ? nSamples - batchStart : batchSize;
+      int currBatchSize =
+          batchStart + batchSize > nSamples ? nSamples - batchStart : batchSize;
       MatrixXd batchX(currBatchSize, nFeatures);
       VectorXd batchy(currBatchSize);
-      for (int i = batchStart; i < currBatchSize; i++) { 
+
+      for (int i = batchStart; i < currBatchSize; i++) {
         int bi = i - batchStart;
         batchX.row(bi) = X.row(randomIdxs[i]);
         batchy(bi) = y(randomIdxs[i]);
       }
-      
-
       VectorXd decisionScores = batchX * weights;
       decisionScores.array() += bias;
       ArrayXd margins = batchy.array() * decisionScores.array();
@@ -59,7 +59,11 @@ void SupportVectorMachine::train(MatrixXd &X, VectorXd &y,
   this->batchSize = batchSize;
 }
 
-int SupportVectorMachine::predict(VectorXd &x) { return -1; }
+int SupportVectorMachine::predict(VectorXd &x) { 
+  double decisionScore = x.dot(weights);
+  decisionScore += bias;
+  return decisionScore > 0 ? 1 : -1;
+}
 
 VectorXd SupportVectorMachine::getWeights() { return weights; }
 
