@@ -5,13 +5,13 @@
 #include <random> 
 #include <cassert>
 
-class Regression {
+class LinearRegression {
 private:
   Eigen::VectorXd weights;
 
 public:
-  Regression();
+  LinearRegression();
   Eigen::VectorXd getWeights();
-  void train(Eigen::MatrixXd, Eigen::VectorXd, double, int);
+  void train(Eigen::MatrixXd xs, Eigen::VectorXd ysTrue, double learningRate = 0.01, int epochs = 5000);
   double predict(Eigen::VectorXd x);
 };

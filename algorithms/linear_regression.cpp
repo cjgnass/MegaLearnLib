@@ -1,13 +1,13 @@
-#include "regression.h"
+#include "linear_regression.h"
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-Regression::Regression() : weights() {}
+LinearRegression::LinearRegression() : weights() {}
 
-VectorXd Regression::getWeights() { return weights; }
+VectorXd LinearRegression::getWeights() { return weights; }
 
-void Regression::train(MatrixXd xs, VectorXd ysTrue,
-                       double learningRate = 0.001, int epochs = 10000) {
+void LinearRegression::train(MatrixXd xs, VectorXd ysTrue,
+                       double learningRate, int epochs) {
   assert(xs.rows() == ysTrue.size());
   MatrixXd A = MatrixXd::Ones(xs.rows(), xs.cols() + 1);
   A.rightCols(xs.cols()) = xs;
@@ -33,8 +33,9 @@ void Regression::train(MatrixXd xs, VectorXd ysTrue,
   weights = w;
 }
 
-double Regression::predict(VectorXd x) {
+double LinearRegression::predict(VectorXd x) {
   VectorXd newX = VectorXd::Ones(x.size());
   newX.tail(x.size()) = x;
   return newX.dot(weights);
 }
+
