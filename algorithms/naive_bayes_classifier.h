@@ -1,26 +1,23 @@
 #pragma once 
-#include <Eigen/Dense>
 #include <algorithm>
-#include <cassert>
-#include <iostream>
 #include <set>
 #include <vector>
+#include <string> 
+#include <unordered_map>
 
 class NaiveBayesClassifier {
+public:
+  void train(std::vector<std::vector<std::string>> &X, std::vector<std::string> &y);
+  std::unordered_map<std::string, double> predict(std::vector<std::string> &x, double smoothing = 0.5);
+  std::unordered_map<std::string, double> getTokenProbabilities(std::string &token);
+  std::set<std::string> getClasses();
+  double getSmoothing();
+
 private:
-  double k;
+  double smoothing;
   std::set<std::string> classes;
   std::unordered_map<std::string, int> classCount;
   std::set<std::string> tokenSet;
   std::unordered_map<std::string, std::unordered_map<std::string, int>> tokenOfClassCount;
   std::unordered_map<std::string, int> classTokensCount;
-
-public:
-  NaiveBayesClassifier();
-  NaiveBayesClassifier(std::set<std::string>, double);
-  void train(std::vector<std::vector<std::string>>, std::vector<std::string>);
-
-  std::unordered_map<std::string, double> predict(std::vector<std::string>);
-  std::unordered_map<std::string, double> getTokenProbabilities(std::string);
-  std::set<std::string> getClasses();
 };

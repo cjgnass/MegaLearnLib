@@ -9,20 +9,20 @@
 #include <vector>
 
 int main() {
-  Eigen::MatrixXd X(6, 1);
-  X << 9.9, 3.4, 2.4, 6.7, 5.5, 0.3;
+  std::vector<std::vector<std::string>> X = {
+      {"offer", "free", "win"}, {"free", "viagra"}, {"meeting", "schedule"},
+      {"project", "deadline"},  {"win", "money"},   {"lunch", "meeting"}};
 
-  Eigen::VectorXd y(6);
-  y << 1, 0, 0, 1, 0, 0;
+  std::vector<std::string> y = {"spam", "spam", "ham", "ham", "spam", "ham"};
 
-  LogisticRegression lr;
-  lr.train(X, y, 0.01, 100000, 3);
+  NaiveBayesClassifier nb;
+  nb.train(X, y);
 
-  std::cout << "Weights: " << lr.getWeights().transpose() << '\n';
-  std::cout << "Bias: " << lr.getBias() << '\n';
+  std::vector<std::string> xTest = {"lunch", "break"};
+  auto probs = nb.predict(xTest, 0.5); // smoothing = 1.0, e.g. Laplace
 
-  // Test a new point
-  Eigen::VectorXd xTest(1);
-  xTest << 5.6; // true y = 2*3 + 3*2 + 1 = 13
-  std::cout << "Predicted: " << lr.predict(xTest) << '\n';
+  std::cout << "Predicted class probabilities:\n";
+  for (const auto &kv : probs) {
+    std::cout << kv.first << ": " << kv.second << '\n';
+  }
 }
